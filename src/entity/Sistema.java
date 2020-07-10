@@ -11,6 +11,7 @@ import org.hibernate.cfg.Configuration;
 public class Sistema {
 	
 	private ArrayList<Utente> utenti;
+	private ArrayList<Segnalazione> segnalazioni;
 	
 	public int getTipoUtente(String Username, String Password) {
 		
@@ -28,6 +29,24 @@ public class Sistema {
 				return c.getTipo();
 		}	
 		return -1;
+	}
+	
+	public ArrayList<Segnalazione> getListaSegnalazioni() {
+		
+		//preleva dal database la persona con tale username e password (se esiste) e in caso di esito positivo, il tipo di utente, altrimenti -1
+		
+		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		Session sessione = sd.openSession();
+		//Filter filter = sessione.enableFilter("FiltroCittadini");
+		//filter.setParameter("tipoUtente", new Integer(0));
+		sessione.beginTransaction();
+		List<Segnalazione> results = sessione.createQuery("from Segnalazioni").list();
+		for(Segnalazione s: results){
+			//System.out.println("UserName:"+c.getUsername()+", ID:"+c.getId());
+			//if((c.getUsername().equals(Username)) && (c.getPassword().equals(Password)))
+				//return c.getTipo();
+		}	
+		return segnalazioni;
 	}
 
 	public Sistema() {
