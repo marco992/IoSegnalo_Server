@@ -2,8 +2,10 @@ package Utils;
 
 import java.net.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import controller.ControllerSegnalazioni;
 import controller.ControllerUtente;
 import entity.Utente;
 
@@ -37,6 +39,8 @@ import java.io.*;
 	{ 
 		int tipo=-1;
 		int tipoRisposta=-1;
+    	int IDUtente = -1;
+
 		while (true) 
 		{ 
 			try { 
@@ -69,9 +73,12 @@ import java.io.*;
                     	tipoRisposta=0;
                 		System.out.println(" Tipo: " + tipo);
                     break;
-                    //case value2:
-                    //...
-                    //break;
+                    case "1":
+                    	IDUtente=Integer.parseInt(messaggioIN.get(1).toString());
+                    	System.out.println("IDUtente: "+IDUtente);
+                    	tipoRisposta=1;
+                    	
+                    break;
                     // eventuali altri case
                     //case valueN:
                     //...
@@ -87,14 +94,27 @@ import java.io.*;
                 {
                 	case 0:
                 		System.out.println("Effettuo adesso l'invio della risposta...");
+                		MessaggioOutput.clear();
                 		MessaggioOutput.add(0);
                 		MessaggioOutput.add(tipo);
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
                 		break;
-                        //case value2:
-                        //...
-                        //break;
+                    case 1:
+                		System.out.println("Effettuo adesso l'invio della risposta...");
+                    	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
+                		MessaggioOutput.clear();
+                		MessaggioOutput.add(1);
+                		ArrayList out = C_Segnalazione.getListaSegnalazioniUtente(IDUtente);
+                		int i;
+                		for(i=0;i<out.size();i++) {
+                			System.out.println("indice: "+i + ", Informazione inviata: "+out.get(i).toString());
+                			MessaggioOutput.add(out.get(i).toString());
+                		}
+                		//MessaggioOutput.add(tipo);
+                		objectOutputStream.writeObject(MessaggioOutput);
+                        objectOutputStream.flush();
+                    break;
                         // eventuali altri case
                         //case valueN:
                         //...

@@ -16,7 +16,8 @@ public class Segnalazione {
 		private int id;
 		private String tipologia;
 		private String descrizione;
-		private int IDcittadino;
+		private int cittadino;
+		private String nota;
 		private int stato;
 		private Date DataModifica;
 		private double latitudine;
@@ -29,13 +30,14 @@ public class Segnalazione {
 
 
 
-		public Segnalazione(int id, String tipologia, String descrizione, int iDcittadino, int stato, Date dataModifica,
+		public Segnalazione(int id, String tipologia, String descrizione, int iDcittadino, String nota, int stato, Date dataModifica,
 				double latitudine, double longitudine) {
 			super();
 			this.id = id;
 			this.tipologia = tipologia;
 			this.descrizione = descrizione;
-			IDcittadino = iDcittadino;
+			this.cittadino = iDcittadino;
+			this.nota = nota;
 			this.stato = stato;
 			DataModifica = dataModifica;
 			this.latitudine = latitudine;
@@ -74,12 +76,12 @@ public class Segnalazione {
 
 
 		public int getIDcittadino() {
-			return IDcittadino;
+			return cittadino;
 		}
 
 
 		public void setIDcittadino(int iDcittadino) {
-			IDcittadino = iDcittadino;
+			cittadino = iDcittadino;
 		}
 
 
