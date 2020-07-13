@@ -1,29 +1,36 @@
-package Utils;
+package controller;
 
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import controller.ControllerSegnalazioni;
-import controller.ControllerUtente;
 import entity.Utente;
 
 import java.io.*;
 
-	public class SocketManager { 
+	public class ControllerComunicazione { 
 		private int port; 
 		private ServerSocket server;
-	
+		private boolean enabled;
+		ControllerUtente C_User;
+		
+		String Username;
 
-	public SocketManager (int port) 
+	public ControllerComunicazione (int port) 
 	{ 
 		this.port = port; 
 		if(!avviaServer()) 
 			System.err.println("Errore durante la creazione del Server"); 
 		}
+	
+		public void setEnable(boolean stato)
+		{
+			enabled=stato;
+		}
 
 	private boolean avviaServer() { 
+		enabled=true;
 		try { 
 			server = new ServerSocket(port); 
 			} 
@@ -41,7 +48,7 @@ import java.io.*;
 		int tipoRisposta=-1;
     	int IDUtente = -1;
 
-		while (true) 
+		while (enabled) 
 		{ 
 			try { 
 				// Il server resta in attesa di una richiesta 
@@ -68,10 +75,13 @@ import java.io.*;
                     //verifico il primo elemento dell'arraylist per distinguere i vari messaggi
                     switch(messaggioIN.get(0).toString()) {
                     case "0":
-                    	ControllerUtente C_User = new ControllerUtente();
+                    	C_User = new ControllerUtente();
                     	tipo=C_User.Connetti((String)messaggioIN.get(1), (String)messaggioIN.get(2));
+                    	IDUtente=C_User.prelevaID((String)messaggioIN.get(1));
                     	tipoRisposta=0;
                 		System.out.println(" Tipo: " + tipo);
+                		System.out.println(" ID: " + IDUtente);
+
                     break;
                     case "1":
                     	IDUtente=Integer.parseInt(messaggioIN.get(1).toString());
@@ -93,32 +103,30 @@ import java.io.*;
                 switch(tipoRisposta)
                 {
                 	case 0:
-                		System.out.println("Effettuo adesso l'invio della risposta...");
+                		System.out.println("Effettuo adesso l'invio della risposta di login...");
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(0);
                 		MessaggioOutput.add(tipo);
+                		MessaggioOutput.add(IDUtente);
+                		System.out.println(MessaggioOutput.get(2).toString());
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
                 		break;
                     case 1:
-                		System.out.println("Effettuo adesso l'invio della risposta...");
+                		System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
                     	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(1);
                 		ArrayList out = C_Segnalazione.getListaSegnalazioniUtente(IDUtente);
                 		int i;
+                		if(out!=null)
                 		for(i=0;i<out.size();i++) {
                 			System.out.println("indice: "+i + ", Informazione inviata: "+out.get(i).toString());
                 			MessaggioOutput.add(out.get(i).toString());
                 		}
-                		//MessaggioOutput.add(tipo);
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
                     break;
-                        // eventuali altri case
-                        //case valueN:
-                        //...
-                        //default:
                 }
                 //TimeUnit.SECONDS.sleep(35);
 		        

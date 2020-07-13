@@ -13,6 +13,27 @@ public class Sistema {
 	private static ArrayList<Utente> utenti;
 	private static List<Segnalazione> segnalazioni;
 	
+	static public void inserisciSegnalazione() {
+		
+		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		Session sessione = sd.openSession();
+        
+        //Add new Employee object
+        Segnalazione s = new Segnalazione();
+        
+        //s.setEmail("lokesh@mail.com");
+        //s.setFirstName("lokesh");
+       // s.setLastName("gupta");
+         
+        //Save the employee in database
+        sessione.save(s);
+ 
+        //Commit the transaction
+        sessione.getTransaction().commit();
+
+    }
+	
+	
 	static public int getTipoUtente(String Username, String Password) {
 		
 		//preleva dal database la persona con tale username e password (se esiste) e in caso di esito positivo, il tipo di utente, altrimenti -1
@@ -29,6 +50,26 @@ public class Sistema {
 				return c.getTipo();
 		}	
 		return -1;
+		
+	}
+	 
+	static public int getIDUtente(String Username) {
+		
+		//preleva dal database la persona con tale username e password (se esiste) e in caso di esito positivo, il tipo di utente, altrimenti -1
+		
+		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		Session sessione = sd.openSession();
+		//Filter filter = sessione.enableFilter("FiltroCittadini");
+		//filter.setParameter("tipoUtente", new Integer(0));
+		sessione.beginTransaction();
+		List<Utente> results = sessione.createQuery("from Utente").list();
+		for(Utente c: results){
+			System.out.println("UserName:"+c.getUsername()+", ID:"+c.getId());
+			if(c.getUsername().equals(Username))
+				return c.getId();
+		}	
+		return -1;
+		
 	}
 	
 	static public List<Segnalazione> getListaSegnalazioni() {

@@ -22,4 +22,13 @@ public class ControllerUtente {
 		return tipo;
 	}
 	
+	public int prelevaID(String username)
+	{
+		entity.Sistema sys = new Sistema();
+		//controllo l'esistenza dell'utente e mi ritornerà il tipo di utente connesso
+		int id;
+		id=sys.getIDUtente(username);
+		return id;
+	}
+	
 }
