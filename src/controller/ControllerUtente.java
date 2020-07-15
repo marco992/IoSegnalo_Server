@@ -1,34 +1,39 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import entity.Sistema;
+import entity.Utente;
 
 public class ControllerUtente {
+	
 	public ControllerUtente() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public int Connetti(String username, String password) {
-		entity.Sistema sys = new Sistema();
-		//controllo l'esistenza dell'utente e mi ritornerà il tipo di utente connesso
-		int tipo;
-		tipo=sys.getTipoUtente(username,password);
-		if (tipo==-1)
-				{
-			//nel caso in cui il tipo restituito da Sistema sia negativo, verrà restituito -1, altrimenti il tipo di utente che si è connesso con successo.
-			System.out.println("Utente non trovato oppure password errata!");
-			return -1;
-				}
-		System.out.println("Utente trovato! Username e Password corretta.");
-		return tipo;
-	}
 	
-	public int prelevaID(String username)
-	{
+	public List<Integer> Connetti(String username, String password) {
 		entity.Sistema sys = new Sistema();
+		List<Utente> utenti = sys.getListaUtenti();
 		//controllo l'esistenza dell'utente e mi ritornerà il tipo di utente connesso
-		int id;
-		id=sys.getIDUtente(username);
-		return id;
+		int tipo=-1;
+		int i;
+		for(i=0; i<utenti.size(); i++){
+			System.out.println("UserName:"+utenti.get(i).getUsername()+", ID:"+utenti.get(i).getId());
+			if((utenti.get(i).getUsername().equals(username)) && (utenti.get(i).getPassword().equals(password)))
+				{
+				List<Integer> risposta = new ArrayList<Integer>();
+				risposta.add(utenti.get(i).getTipo());
+				risposta.add(utenti.get(i).getId());
+				return risposta;
+				}
+		}	
+		return null;
 	}
 	
 }

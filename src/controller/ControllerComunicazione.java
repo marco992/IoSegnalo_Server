@@ -3,9 +3,6 @@ package controller;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import entity.Utente;
 
 import java.io.*;
 
@@ -13,9 +10,6 @@ import java.io.*;
 		private int port; 
 		private ServerSocket server;
 		private boolean enabled;
-		ControllerUtente C_User;
-		
-		String Username;
 
 	public ControllerComunicazione (int port) 
 	{ 
@@ -33,6 +27,7 @@ import java.io.*;
 		enabled=true;
 		try { 
 			server = new ServerSocket(port); 
+			server.setSoTimeout(60000);
 			} 
 		catch (IOException ex) {
 			ex.printStackTrace();
@@ -42,17 +37,18 @@ import java.io.*;
 		return true; 
 	}
 
-	public void runServer() throws ClassNotFoundException 
+	public void ascolta() throws ClassNotFoundException 
 	{ 
 		int tipo=-1;
 		int tipoRisposta=-1;
     	int IDUtente = -1;
-
+    	
 		while (enabled) 
 		{ 
 			try { 
 				// Il server resta in attesa di una richiesta 
 				System.out.println("Server in attesa di richieste…"); 
+				
 				Socket s1 = server.accept(); 
 				System.out.println("Un client si e’ connesso…");
 				
@@ -74,34 +70,48 @@ import java.io.*;
                     System.out.println("client: " + messaggioIN.get(0));
                     //verifico il primo elemento dell'arraylist per distinguere i vari messaggi
                     switch(messaggioIN.get(0).toString()) {
+                    //richiesta accesso
                     case "0":
-                    	C_User = new ControllerUtente();
-                    	tipo=C_User.Connetti((String)messaggioIN.get(1), (String)messaggioIN.get(2));
-                    	IDUtente=C_User.prelevaID((String)messaggioIN.get(1));
-                    	tipoRisposta=0;
-                		System.out.println(" Tipo: " + tipo);
-                		System.out.println(" ID: " + IDUtente);
+                    	ControllerUtente C_User = new ControllerUtente();
+                    	List<Integer> in = new ArrayList<Integer>();
+                    	in=C_User.Connetti((String)messaggioIN.get(1), (String)messaggioIN.get(2));
+                    	if(in!=null) 
+                    	{
+                    		tipo=Integer.parseInt(in.get(0).toString());
+                    		IDUtente=Integer.parseInt(in.get(1).toString());
+                    		tipoRisposta=0;
+                    		System.out.println(" Tipo: " + tipo);
+                    		System.out.println(" ID: " + IDUtente);
+                    	}
+                    	else
+                    	{
+                    		tipo=-1;
+                    		IDUtente=-1;
+                    	}
 
                     break;
+                    //richiesta lista segnalazioni di uno specifico cittadino
                     case "1":
                     	IDUtente=Integer.parseInt(messaggioIN.get(1).toString());
                     	System.out.println("IDUtente: "+IDUtente);
                     	tipoRisposta=1;
                     	
                     break;
-                    // eventuali altri case
-                    //case valueN:
-                    //...
-                    //default:
+                    //inserimento nuova segnalazione
+                    case "2":
+                    	System.out.println("Ho ricevuto una richiesta di inserimento segnalazione");
+                    	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
+                		C_Segnalazione.nuovaSegnalazione(Integer.parseInt(messaggioIN.get(1).toString()), messaggioIN.get(2).toString(), Integer.parseInt(messaggioIN.get(3).toString()),Double.parseDouble(messaggioIN.get(4).toString()), Double.parseDouble(messaggioIN.get(5).toString()), messaggioIN.get(6).toString());
+                    	tipoRisposta=2;
+                    	break;
                     }
                 }
-		        //input.close();
-
 
                 ArrayList MessaggioOutput = new ArrayList();
 
                 switch(tipoRisposta)
                 {
+                //risposta ad una richiesta di accesso, viene inviato il tipo e id dell'utente
                 	case 0:
                 		System.out.println("Effettuo adesso l'invio della risposta di login...");
                 		MessaggioOutput.clear();
@@ -112,23 +122,34 @@ import java.io.*;
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
                 		break;
+                		//risposta ad una richiesta di visualizzazione segnalazioni cittadino
                     case 1:
                 		System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
                     	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(1);
-                		ArrayList out = C_Segnalazione.getListaSegnalazioniUtente(IDUtente);
+                		ArrayList ListaSegnalazioni = C_Segnalazione.getListaSegnalazioniUtente(IDUtente);
                 		int i;
-                		if(out!=null)
-                		for(i=0;i<out.size();i++) {
-                			System.out.println("indice: "+i + ", Informazione inviata: "+out.get(i).toString());
-                			MessaggioOutput.add(out.get(i).toString());
+                		if(ListaSegnalazioni!=null)
+                		{
+                			for(i=0;i<ListaSegnalazioni.size();i++) {
+                				System.out.println("indice: "+i + ", Informazione inviata: "+ListaSegnalazioni.get(i).toString());
+                				MessaggioOutput.add(ListaSegnalazioni.get(i).toString());
+                			}
                 		}
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
                     break;
+                    //risposta ad un inserimento nel database, esito negativo -1, esito positivo 1
+                    case 2:
+                    	System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
+                		MessaggioOutput.clear();
+                		MessaggioOutput.add(2);
+                		objectOutputStream.writeObject(MessaggioOutput);
+                        objectOutputStream.flush();
+           
+                    break;
                 }
-                //TimeUnit.SECONDS.sleep(35);
 		        
 		        objectOutputStream.close();
 		        input.close();
@@ -136,27 +157,13 @@ import java.io.*;
 		        
 		        System.out.println("Chiusura connessione effettuata");
 		        
-
-			} catch (IOException ex) 
-				{ 
-					ex.printStackTrace(); 
-					System.out.println("Errore!");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 		 
 	}
 		
 
-	}
-	
-	public ArrayList riceviDati() {
-		return null;
-	}
-	
-	public void inviaDati(ArrayList dati) {
-		
 	}
 
 }

@@ -1,7 +1,13 @@
 package entity;
 
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.transaction.Transactional;
 
 //import org.hibernate.Filter;
 import org.hibernate.Session;
@@ -10,25 +16,48 @@ import org.hibernate.cfg.Configuration;
 
 public class Sistema {
 	
-	private static ArrayList<Utente> utenti;
+	private static List<Utente> utenti;
 	private static List<Segnalazione> segnalazioni;
 	
-	static public void inserisciSegnalazione() {
+	public Sistema() {
+		super();
+	}
+	
+	static public List<Utente> getListaUtenti() {
+		
+		//preleva tutte le segnalazioni dalla tabella Segnalazioni
 		
 		SessionFactory sd = new Configuration().configure().buildSessionFactory();
 		Session sessione = sd.openSession();
-        
-        //Add new Employee object
+		sessione.beginTransaction();
+		utenti = sessione.createQuery("from Utente").list();
+		return utenti;
+		
+	}
+	
+    @Transactional
+	static public void inserisciSegnalazione(int Tipologia, String Descrizione, int IDCittadino, Double Latitudine, Double Longitudine, String Recapito) {
+		
+		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		Session sessione = sd.openSession();
+		sessione.beginTransaction();
+
+		java.util.Date utilDate = new java.util.Date();
+        java.sql.Date Data = new java.sql.Date(utilDate.getTime());
         Segnalazione s = new Segnalazione();
         
-        //s.setEmail("lokesh@mail.com");
-        //s.setFirstName("lokesh");
-       // s.setLastName("gupta");
-         
-        //Save the employee in database
+        s.setStato(0);
+        s.setDataModifica(Data);
+        s.setTipologia(Tipologia);
+        s.setDescrizione(Descrizione);
+        s.setIDcittadino(IDCittadino);
+        s.setLatitudine(Latitudine);
+        s.setLongitudine(Longitudine);
+        s.setNota("Nessuna");
+        s.setRecapito(Recapito);
+        
         sessione.save(s);
  
-        //Commit the transaction
         sessione.getTransaction().commit();
 
     }
@@ -40,8 +69,6 @@ public class Sistema {
 		
 		SessionFactory sd = new Configuration().configure().buildSessionFactory();
 		Session sessione = sd.openSession();
-		//Filter filter = sessione.enableFilter("FiltroCittadini");
-		//filter.setParameter("tipoUtente", new Integer(0));
 		sessione.beginTransaction();
 		List<Utente> results = sessione.createQuery("from Utente").list();
 		for(Utente c: results){
@@ -59,8 +86,6 @@ public class Sistema {
 		
 		SessionFactory sd = new Configuration().configure().buildSessionFactory();
 		Session sessione = sd.openSession();
-		//Filter filter = sessione.enableFilter("FiltroCittadini");
-		//filter.setParameter("tipoUtente", new Integer(0));
 		sessione.beginTransaction();
 		List<Utente> results = sessione.createQuery("from Utente").list();
 		for(Utente c: results){
@@ -81,10 +106,7 @@ public class Sistema {
 		sessione.beginTransaction();
 		segnalazioni = sessione.createQuery("from Segnalazione").list();
 		return segnalazioni;
+		
 	}
 
-	public Sistema() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
 }

@@ -7,17 +7,15 @@ import entity.Sistema;
 
 public class ControllerSegnalazioni {
 
-	private List<entity.Segnalazione> ListaSegnalazioni;
-
 	public ControllerSegnalazioni() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public void nuovaSegnalazione() {
+	public void nuovaSegnalazione(int Tipologia, String Descrizione, int IDCittadino, Double Latitudine, Double Longitudine, String Recapito) {
 		//effettua controllo correttezza dati
 		//inserisci segnalazione richiamando funzione in Sistema
-		
+		Sistema.inserisciSegnalazione(Tipologia, Descrizione, IDCittadino, Latitudine, Longitudine, Recapito);
 	}
 	
 	public void eliminaSegnalazione(int IdSegnalazione) {

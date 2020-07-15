@@ -1,6 +1,5 @@
-package Boundary;
+package boundary;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -11,8 +10,6 @@ import controller.ControllerComunicazione;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import java.awt.Font;
-import java.awt.Window.Type;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
@@ -21,7 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.Color;
 
 public class MainFrame extends JFrame {
-    Thread Thread1 = null;
+    Thread Thread_1 = null;
     ControllerComunicazione sm;
 
 	private JPanel contentPane;
@@ -60,7 +57,8 @@ public class MainFrame extends JFrame {
 		statoLbl.setForeground(Color.RED);
 		statoLbl.setBounds(164, 40, 58, 14);
 		contentPane.add(statoLbl);
-		
+		JButton fermaBtn = new JButton("Ferma Server");
+		fermaBtn.setEnabled(false);
 		JButton avviaBtn = new JButton("Avvia Server");
 		avviaBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -71,9 +69,11 @@ public class MainFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 					
-			        Thread1 = new Thread(new Thread1());
-			        Thread1.start();
+			        Thread_1 = new Thread(new Thread());
+			        Thread_1.start();
 			        avviaBtn.setEnabled(false);
+					fermaBtn.setEnabled(true);
+
 			        statoLbl.setText("ONLINE");
 			        statoLbl.setForeground(Color.green);
 			
@@ -82,15 +82,18 @@ public class MainFrame extends JFrame {
 		avviaBtn.setBounds(26, 110, 120, 23);
 		contentPane.add(avviaBtn);
 		
-		JButton fermaBtn = new JButton("Ferma Server");
+
 		fermaBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
 					sm.setEnable(false);
-					Thread1.join();
+					avviaBtn.setEnabled(true);
+					fermaBtn.setEnabled(false);
+					Thread_1.join();
 					statoLbl.setText("OFFLINE");
 			        statoLbl.setForeground(Color.red);
+
 			        
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
@@ -106,14 +109,25 @@ public class MainFrame extends JFrame {
 		label1.setBounds(71, 40, 84, 14);
 		contentPane.add(label1);
 		
+		JButton btnNewButton = new JButton("Test");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				//ControllerSegnalazioni c_s = new ControllerSegnalazioni();
+				//c_s.nuovaSegnalazione();
+			}
+		});
+		btnNewButton.setBounds(110, 76, 89, 23);
+		contentPane.add(btnNewButton);
+		
 
 	}
-	class Thread1 implements Runnable {
+	class Thread_1 implements Runnable {
         @Override
         public void run() {
         	sm = new ControllerComunicazione(7777); 
         	try {
-				sm.runServer();
+				sm.ascolta();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
