@@ -14,7 +14,6 @@ public class ControllerUtente {
 	
 	public ControllerUtente() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	public List<Integer> Connetti(String username, String password) {

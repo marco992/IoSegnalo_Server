@@ -9,9 +9,12 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 //import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 public class Sistema {
@@ -106,6 +109,19 @@ public class Sistema {
 		sessione.beginTransaction();
 		segnalazioni = sessione.createQuery("from Segnalazione").list();
 		return segnalazioni;
+		
+	}
+	
+	static public void updateSegnalazione(Segnalazione S) {
+		
+		//aggiorna una specifica segnalazione sul database
+		
+		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		Session sessione = sd.openSession();
+        Transaction tx = sessione.beginTransaction();
+		sessione.update(S);
+        tx.commit();
+
 		
 	}
 

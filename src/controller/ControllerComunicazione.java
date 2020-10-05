@@ -42,7 +42,7 @@ import java.io.*;
 		int tipo=-1;
 		int tipoRisposta=-1;
     	int IDUtente = -1;
-    	
+    	int Stato=-1;
 		while (enabled) 
 		{ 
 			try { 
@@ -59,15 +59,19 @@ import java.io.*;
 		        ObjectInputStream input;
 		        input = new ObjectInputStream(InStream);
         		
-		        System.out.println("Effettuo la lettura dei dati dal client...");
+		        //System.out.println("Effettuo la lettura dei dati dal client...");
 
 		        ArrayList messaggioIN = new ArrayList();
 		        messaggioIN = (ArrayList)input.readObject();
+                ArrayList MessaggioOutput = new ArrayList();
+
 		        System.out.println("Effettuo la lettura dei dati dal client...");
 
                 if (messaggioIN != null) 
                 {
                     System.out.println("client: " + messaggioIN.get(0));
+                	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
+
                     //verifico il primo elemento dell'arraylist per distinguere i vari messaggi
                     switch(messaggioIN.get(0).toString()) {
                     //richiesta accesso
@@ -79,7 +83,16 @@ import java.io.*;
                     	{
                     		tipo=Integer.parseInt(in.get(0).toString());
                     		IDUtente=Integer.parseInt(in.get(1).toString());
-                    		tipoRisposta=0;
+                    		System.out.println("Effettuo adesso l'invio della risposta di login...");
+                            //risposta ad una richiesta di accesso, viene inviato il tipo e id dell'utente
+
+                    		MessaggioOutput.clear();
+                    		MessaggioOutput.add(0);
+                    		MessaggioOutput.add(tipo);
+                    		MessaggioOutput.add(IDUtente);
+                    		System.out.println(MessaggioOutput.get(2).toString());
+                    		objectOutputStream.writeObject(MessaggioOutput);
+                            objectOutputStream.flush();
                     		System.out.println(" Tipo: " + tipo);
                     		System.out.println(" ID: " + IDUtente);
                     	}
@@ -94,41 +107,14 @@ import java.io.*;
                     case "1":
                     	IDUtente=Integer.parseInt(messaggioIN.get(1).toString());
                     	System.out.println("IDUtente: "+IDUtente);
-                    	tipoRisposta=1;
-                    	
-                    break;
-                    //inserimento nuova segnalazione
-                    case "2":
-                    	System.out.println("Ho ricevuto una richiesta di inserimento segnalazione");
-                    	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
-                		C_Segnalazione.nuovaSegnalazione(Integer.parseInt(messaggioIN.get(1).toString()), messaggioIN.get(2).toString(), Integer.parseInt(messaggioIN.get(3).toString()),Double.parseDouble(messaggioIN.get(4).toString()), Double.parseDouble(messaggioIN.get(5).toString()), messaggioIN.get(6).toString());
-                    	tipoRisposta=2;
-                    	break;
-                    }
-                }
-
-                ArrayList MessaggioOutput = new ArrayList();
-
-                switch(tipoRisposta)
-                {
-                //risposta ad una richiesta di accesso, viene inviato il tipo e id dell'utente
-                	case 0:
-                		System.out.println("Effettuo adesso l'invio della risposta di login...");
-                		MessaggioOutput.clear();
-                		MessaggioOutput.add(0);
-                		MessaggioOutput.add(tipo);
-                		MessaggioOutput.add(IDUtente);
-                		System.out.println(MessaggioOutput.get(2).toString());
-                		objectOutputStream.writeObject(MessaggioOutput);
-                        objectOutputStream.flush();
-                		break;
+                       
                 		//risposta ad una richiesta di visualizzazione segnalazioni cittadino
-                    case 1:
-                		System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
-                    	ControllerSegnalazioni C_Segnalazione = new ControllerSegnalazioni();
+
+                    	System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(1);
-                		ArrayList ListaSegnalazioni = C_Segnalazione.getListaSegnalazioniUtente(IDUtente);
+
+                		ArrayList ListaSegnalazioni = C_Segnalazione.richiediListaSegnalazioniUtente(IDUtente);
                 		int i;
                 		if(ListaSegnalazioni!=null)
                 		{
@@ -140,17 +126,63 @@ import java.io.*;
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
                     break;
-                    //risposta ad un inserimento nel database, esito negativo -1, esito positivo 1
-                    case 2:
+                    //inserimento nuova segnalazione
+                    case "2":
+                    	System.out.println("Ho ricevuto una richiesta di inserimento segnalazione");
+
+                    	C_Segnalazione.nuovaSegnalazione(Integer.parseInt(messaggioIN.get(1).toString()), messaggioIN.get(2).toString(), Integer.parseInt(messaggioIN.get(3).toString()),Double.parseDouble(messaggioIN.get(4).toString()), Double.parseDouble(messaggioIN.get(5).toString()), messaggioIN.get(6).toString());
                     	System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
-                		MessaggioOutput.clear();
+                    	 //risposta ad un inserimento nel database, esito negativo -1, esito positivo 1
+                    	MessaggioOutput.clear();
                 		MessaggioOutput.add(2);
+                		MessaggioOutput.add(1);
                 		objectOutputStream.writeObject(MessaggioOutput);
                         objectOutputStream.flush();
-           
+                    	break;
+                    
+                    case "4":
+       
+                    	Stato=Integer.parseInt(messaggioIN.get(1).toString());
+                    	System.out.println("Stato: "+Stato);
+                		System.out.println("Effettuo adesso l'invio della risposta di vis. segnalazioni...");
+                    	C_Segnalazione = new ControllerSegnalazioni();
+                		MessaggioOutput.clear();
+                		MessaggioOutput.add(4);
+                		ArrayList ListaSegnalazioniAperte = C_Segnalazione.richiediListaSegnalazionibyStato(IDUtente,Stato);
+                		if(ListaSegnalazioniAperte!=null)
+                		{
+                			for(i=0;i<ListaSegnalazioniAperte.size();i++) {
+                				System.out.println("indice: "+i + ", Informazione inviata: "+ListaSegnalazioniAperte.get(i).toString());
+                				MessaggioOutput.add(ListaSegnalazioniAperte.get(i).toString());
+                			}
+                		}
+                		objectOutputStream.writeObject(MessaggioOutput);
+                        objectOutputStream.flush();
+                	
                     break;
+                    
+                    case "5":
+                    	IDUtente = Integer.parseInt(messaggioIN.get(1).toString());
+                    	int IDSegnalazione, NuovoStato;
+                    	IDSegnalazione=Integer.parseInt(messaggioIN.get(2).toString());
+                    	NuovoStato=Integer.parseInt(messaggioIN.get(3).toString());
+                    	System.out.println("IDUtente: "+ IDUtente + "IDSegnalazione: " + IDSegnalazione + "Nuovo stato: " + NuovoStato);
+                    	ControllerSegnalazioni C_Segnalazione3 = new ControllerSegnalazioni();
+                    	C_Segnalazione3.modificaStatoSegnalazione(IDSegnalazione, IDUtente, NuovoStato);
+                    	ControllerInterventi C_Interventi = new ControllerInterventi();
+                    	C_Interventi.inserisciIntervento(IDSegnalazione, IDUtente);
+                		System.out.println("Effettuo adesso l'invio della risposta di presa in carico intervento...");
+                		MessaggioOutput.clear();
+                		MessaggioOutput.add(5);
+                		MessaggioOutput.add(1);
+                		objectOutputStream.writeObject(MessaggioOutput);
+                        objectOutputStream.flush();
+                    	break;
+                    default: 
+                    	System.out.println("Richiesta non gestita: "+ messaggioIN.get(0).toString());
+                    }
                 }
-		        
+
 		        objectOutputStream.close();
 		        input.close();
 		        s1.close();

@@ -13,7 +13,6 @@ public class ControllerSegnalazioni {
 	}
 
 	public void nuovaSegnalazione(int Tipologia, String Descrizione, int IDCittadino, Double Latitudine, Double Longitudine, String Recapito) {
-		//effettua controllo correttezza dati
 		//inserisci segnalazione richiamando funzione in Sistema
 		Sistema.inserisciSegnalazione(Tipologia, Descrizione, IDCittadino, Latitudine, Longitudine, Recapito);
 	}
@@ -22,11 +21,24 @@ public class ControllerSegnalazioni {
 		
 	}
 	
-	public void modificaSegnalazione(int NuovoStato) {
-		
+	public void modificaStatoSegnalazione(int CodiceSegnalazione, int CodiceUtente, int NuovoStato) {
+		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
+		java.util.Date utilDate = new java.util.Date();
+		ArrayList out = new ArrayList();
+		int i;
+		for(i=0;i<Segnalazioni.size();i++)
+		{
+			if(Segnalazioni.get(i).getId()==CodiceSegnalazione) {
+				entity.Segnalazione temp = Segnalazioni.get(i);
+		        java.sql.Date Data = new java.sql.Date(utilDate.getTime());
+				temp.setDataModifica(Data);
+				temp.setStato(NuovoStato);
+				Sistema.updateSegnalazione(temp);
+			}
+		}
 	}
 	
-	public ArrayList getListaSegnalazioniUtente(int IdUtente) {
+	public ArrayList richiediListaSegnalazioniUtente(int IdUtente) {
 		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
 		ArrayList out = new ArrayList();
 		int i;
@@ -47,7 +59,28 @@ public class ControllerSegnalazioni {
 			return null;
 	}
 	
-	public List<entity.Segnalazione> getListaSegnalazioniCompleta() {
+	public ArrayList richiediListaSegnalazionibyStato(int IdUtente, int Stato) {
+		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
+		ArrayList out = new ArrayList();
+		int i;
+		for(i=0;i<Segnalazioni.size();i++)
+		{
+			if(Segnalazioni.get(i).getStato()==Stato) {
+				//System.out.println("Sono entrato! ID utente1"+IdUtente + "ID utente 2:"+Segnalazioni.get(i).getId());
+				out.add(Segnalazioni.get(i).getId());
+				out.add(Segnalazioni.get(i).getLatitudine());
+				out.add(Segnalazioni.get(i).getLongitudine());
+				out.add(Segnalazioni.get(i).getDataModifica());
+				out.add(Segnalazioni.get(i).getStato());
+			}
+		}
+		if (out.size()>0)
+			return out;
+		else
+			return null;
+	}
+	
+	public List<entity.Segnalazione> richiediListaSegnalazioni() {
 		
 		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
 		ArrayList out = new ArrayList();

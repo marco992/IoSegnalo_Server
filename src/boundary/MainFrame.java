@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.Color;
 
 public class MainFrame extends JFrame {
-    Thread Thread_1 = null;
+    Thread Thread1 = null;
     ControllerComunicazione sm;
 
 	private JPanel contentPane;
@@ -68,9 +68,9 @@ public class MainFrame extends JFrame {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-					
-			        Thread_1 = new Thread(new Thread());
-			        Thread_1.start();
+
+			        Thread1 = new Thread(new Thread1());
+			        Thread1.start();
 			        avviaBtn.setEnabled(false);
 					fermaBtn.setEnabled(true);
 
@@ -79,7 +79,7 @@ public class MainFrame extends JFrame {
 			
 			}
 		});
-		avviaBtn.setBounds(26, 110, 120, 23);
+		avviaBtn.setBounds(26, 97, 120, 23);
 		contentPane.add(avviaBtn);
 		
 
@@ -90,7 +90,7 @@ public class MainFrame extends JFrame {
 					sm.setEnable(false);
 					avviaBtn.setEnabled(true);
 					fermaBtn.setEnabled(false);
-					Thread_1.join();
+					Thread1.join();
 					statoLbl.setText("OFFLINE");
 			        statoLbl.setForeground(Color.red);
 
@@ -102,33 +102,26 @@ public class MainFrame extends JFrame {
 		        
 			}
 		});
-		fermaBtn.setBounds(172, 110, 120, 23);
+		fermaBtn.setBounds(177, 97, 120, 23);
 		contentPane.add(fermaBtn);
 		
 		JLabel label1 = new JLabel("Stato server: ");
 		label1.setBounds(71, 40, 84, 14);
 		contentPane.add(label1);
 		
-		JButton btnNewButton = new JButton("Test");
-		btnNewButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				//ControllerSegnalazioni c_s = new ControllerSegnalazioni();
-				//c_s.nuovaSegnalazione();
-			}
-		});
-		btnNewButton.setBounds(110, 76, 89, 23);
-		contentPane.add(btnNewButton);
 		
 
 	}
-	class Thread_1 implements Runnable {
+	class Thread1 implements Runnable {
         @Override
         public void run() {
+
         	sm = new ControllerComunicazione(7777); 
         	try {
 				sm.ascolta();
 			} catch (ClassNotFoundException e) {
+							System.err.println("Errore durante la creazione del Server"); 
+
 				e.printStackTrace();
 			}
         }
