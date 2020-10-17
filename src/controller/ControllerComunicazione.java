@@ -114,7 +114,7 @@ import java.io.*;
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(1);
 
-                		ArrayList ListaSegnalazioni = C_Segnalazione.richiediListaSegnalazioniUtente(IDUtente);
+                		ArrayList ListaSegnalazioni = C_Segnalazione.prelevaListaSegnalazioniUtente(IDUtente);
                 		int i;
                 		if(ListaSegnalazioni!=null)
                 		{
@@ -148,7 +148,7 @@ import java.io.*;
                     	C_Segnalazione = new ControllerSegnalazioni();
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(4);
-                		ArrayList ListaSegnalazioniAperte = C_Segnalazione.richiediListaSegnalazionibyStato(IDUtente,Stato);
+                		ArrayList ListaSegnalazioniAperte = C_Segnalazione.prelevaListaSegnalazionibyStato(IDUtente,Stato);
                 		if(ListaSegnalazioniAperte!=null)
                 		{
                 			for(i=0;i<ListaSegnalazioniAperte.size();i++) {
@@ -170,7 +170,7 @@ import java.io.*;
                     	ControllerSegnalazioni C_Segnalazione3 = new ControllerSegnalazioni();
                     	C_Segnalazione3.modificaStatoSegnalazione(IDSegnalazione, IDUtente, NuovoStato);
                     	ControllerInterventi C_Interventi = new ControllerInterventi();
-                    	C_Interventi.inserisciIntervento(IDSegnalazione, IDUtente);
+                    	C_Interventi.nuovoIntervento(IDSegnalazione, IDUtente);
                 		System.out.println("Effettuo adesso l'invio della risposta di presa in carico intervento...");
                 		MessaggioOutput.clear();
                 		MessaggioOutput.add(5);

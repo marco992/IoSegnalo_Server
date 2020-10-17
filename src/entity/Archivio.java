@@ -17,12 +17,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
-public class Sistema {
+public class Archivio {
 	
 	private static List<Utente> utenti;
 	private static List<Segnalazione> segnalazioni;
 	
-	public Sistema() {
+	public Archivio() {
 		super();
 	}
 	
@@ -66,39 +66,6 @@ public class Sistema {
     }
 	
 	
-	static public int getTipoUtente(String Username, String Password) {
-		
-		//preleva dal database la persona con tale username e password (se esiste) e in caso di esito positivo, il tipo di utente, altrimenti -1
-		
-		SessionFactory sd = new Configuration().configure().buildSessionFactory();
-		Session sessione = sd.openSession();
-		sessione.beginTransaction();
-		List<Utente> results = sessione.createQuery("from Utente").list();
-		for(Utente c: results){
-			System.out.println("UserName:"+c.getUsername()+", ID:"+c.getId());
-			if((c.getUsername().equals(Username)) && (c.getPassword().equals(Password)))
-				return c.getTipo();
-		}	
-		return -1;
-		
-	}
-	 
-	static public int getIDUtente(String Username) {
-		
-		//preleva dal database la persona con tale username e password (se esiste) e in caso di esito positivo, il tipo di utente, altrimenti -1
-		
-		SessionFactory sd = new Configuration().configure().buildSessionFactory();
-		Session sessione = sd.openSession();
-		sessione.beginTransaction();
-		List<Utente> results = sessione.createQuery("from Utente").list();
-		for(Utente c: results){
-			System.out.println("UserName:"+c.getUsername()+", ID:"+c.getId());
-			if(c.getUsername().equals(Username))
-				return c.getId();
-		}	
-		return -1;
-		
-	}
 	
 	static public List<Segnalazione> getListaSegnalazioni() {
 		
@@ -112,7 +79,7 @@ public class Sistema {
 		
 	}
 	
-	static public void updateSegnalazione(Segnalazione S) {
+	static public void aggiornaSegnalazione(Segnalazione S) {
 		
 		//aggiorna una specifica segnalazione sul database
 		
@@ -123,6 +90,16 @@ public class Sistema {
         tx.commit();
 
 		
+	}
+	
+	static public void inserisciIntervento(Intervento I) {
+		
+		//aggiorna una specifica segnalazione sul database
+		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		Session sessione = sd.openSession();
+		sessione.beginTransaction();
+        sessione.save(I);
+        sessione.getTransaction().commit();
 	}
 
 }

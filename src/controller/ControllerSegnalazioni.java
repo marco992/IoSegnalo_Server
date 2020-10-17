@@ -3,7 +3,7 @@ package controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import entity.Sistema;
+import entity.Archivio;
 
 public class ControllerSegnalazioni {
 
@@ -14,7 +14,7 @@ public class ControllerSegnalazioni {
 
 	public void nuovaSegnalazione(int Tipologia, String Descrizione, int IDCittadino, Double Latitudine, Double Longitudine, String Recapito) {
 		//inserisci segnalazione richiamando funzione in Sistema
-		Sistema.inserisciSegnalazione(Tipologia, Descrizione, IDCittadino, Latitudine, Longitudine, Recapito);
+		Archivio.inserisciSegnalazione(Tipologia, Descrizione, IDCittadino, Latitudine, Longitudine, Recapito);
 	}
 	
 	public void eliminaSegnalazione(int IdSegnalazione) {
@@ -22,7 +22,7 @@ public class ControllerSegnalazioni {
 	}
 	
 	public void modificaStatoSegnalazione(int CodiceSegnalazione, int CodiceUtente, int NuovoStato) {
-		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
+		List<entity.Segnalazione> Segnalazioni = Archivio.getListaSegnalazioni();
 		java.util.Date utilDate = new java.util.Date();
 		ArrayList out = new ArrayList();
 		int i;
@@ -33,13 +33,13 @@ public class ControllerSegnalazioni {
 		        java.sql.Date Data = new java.sql.Date(utilDate.getTime());
 				temp.setDataModifica(Data);
 				temp.setStato(NuovoStato);
-				Sistema.updateSegnalazione(temp);
+				Archivio.aggiornaSegnalazione(temp);
 			}
 		}
 	}
 	
-	public ArrayList richiediListaSegnalazioniUtente(int IdUtente) {
-		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
+	public ArrayList prelevaListaSegnalazioniUtente(int IdUtente) {
+		List<entity.Segnalazione> Segnalazioni = Archivio.getListaSegnalazioni();
 		ArrayList out = new ArrayList();
 		int i;
 		for(i=0;i<Segnalazioni.size();i++)
@@ -47,6 +47,7 @@ public class ControllerSegnalazioni {
 			if(Segnalazioni.get(i).getIDcittadino()==IdUtente) {
 				//System.out.println("Sono entrato! ID utente1"+IdUtente + "ID utente 2:"+Segnalazioni.get(i).getId());
 				out.add(Segnalazioni.get(i).getId());
+				out.add(Segnalazioni.get(i).getDescrizione());
 				out.add(Segnalazioni.get(i).getLatitudine());
 				out.add(Segnalazioni.get(i).getLongitudine());
 				out.add(Segnalazioni.get(i).getDataModifica());
@@ -59,8 +60,8 @@ public class ControllerSegnalazioni {
 			return null;
 	}
 	
-	public ArrayList richiediListaSegnalazionibyStato(int IdUtente, int Stato) {
-		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
+	public ArrayList prelevaListaSegnalazionibyStato(int IdUtente, int Stato) {
+		List<entity.Segnalazione> Segnalazioni = Archivio.getListaSegnalazioni();
 		ArrayList out = new ArrayList();
 		int i;
 		for(i=0;i<Segnalazioni.size();i++)
@@ -68,6 +69,7 @@ public class ControllerSegnalazioni {
 			if(Segnalazioni.get(i).getStato()==Stato) {
 				//System.out.println("Sono entrato! ID utente1"+IdUtente + "ID utente 2:"+Segnalazioni.get(i).getId());
 				out.add(Segnalazioni.get(i).getId());
+				out.add(Segnalazioni.get(i).getDescrizione());
 				out.add(Segnalazioni.get(i).getLatitudine());
 				out.add(Segnalazioni.get(i).getLongitudine());
 				out.add(Segnalazioni.get(i).getDataModifica());
@@ -80,14 +82,15 @@ public class ControllerSegnalazioni {
 			return null;
 	}
 	
-	public List<entity.Segnalazione> richiediListaSegnalazioni() {
+	public List<entity.Segnalazione> prelevaListaSegnalazioni() {
 		
-		List<entity.Segnalazione> Segnalazioni = Sistema.getListaSegnalazioni();
+		List<entity.Segnalazione> Segnalazioni = Archivio.getListaSegnalazioni();
 		ArrayList out = new ArrayList();
 		int i;
 		for(i=0;i<Segnalazioni.size();i++)
 		{
 				out.add(Segnalazioni.get(i).getId());
+				out.add(Segnalazioni.get(i).getDescrizione());
 				out.add(Segnalazioni.get(i).getLatitudine());
 				out.add(Segnalazioni.get(i).getLongitudine());
 				out.add(Segnalazioni.get(i).getDataModifica());

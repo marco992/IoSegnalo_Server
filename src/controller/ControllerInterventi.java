@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import entity.Archivio;
 import entity.Intervento;
 import entity.Segnalazione;
 
@@ -16,11 +17,11 @@ public class ControllerInterventi {
 	}
 	
     @Transactional
-    public void inserisciIntervento(int CodiceSegnalazione, int IDUtente) {
+    public void nuovoIntervento(int CodiceSegnalazione, int IDUtente) {
 		System.out.println("Codice: " + CodiceSegnalazione + "IDUtente: " + IDUtente);
-		SessionFactory sd = new Configuration().configure().buildSessionFactory();
+		/*SessionFactory sd = new Configuration().configure().buildSessionFactory();
 		Session sessione = sd.openSession();
-		sessione.beginTransaction();
+		sessione.beginTransaction();*/
 
 		java.util.Date utilDate = new java.util.Date();
         java.sql.Date Data = new java.sql.Date(utilDate.getTime());
@@ -30,8 +31,9 @@ public class ControllerInterventi {
         i.setResponsabile(IDUtente);
         i.setDataInizio(Data);
         
-        sessione.save(i);
+        Archivio.inserisciIntervento(i);
+        //sessione.save(i);
  
-        sessione.getTransaction().commit();
+        //sessione.getTransaction().commit();
     }
 }
